@@ -6,7 +6,7 @@ import struct
 import time
 import select
 import binascii
-# use mac or linux terminal to run code using sudo Python testing.py
+
 ICMP_ECHO_REQUEST = 8
 MAX_HOPS = 30
 TIMEOUT = 2.0
@@ -125,5 +125,6 @@ def get_route(hostname):
                     break
             finally:
                 mySocket.close()
-
+             
+            
 get_route('www.google.com')
