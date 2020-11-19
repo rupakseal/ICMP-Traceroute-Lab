@@ -96,14 +96,17 @@ def get_route(hostname):
                 howLongInSelect = (time.time() - startedSelect)
 
                 if whatReady[0] == []:  # Timeout
+                    print("*    *    * 1 Request timed out.")
                     tracelist1.append("*    *    * Request timed out.")
-
+                tracelist1.append(whatReady[0])
                 recvPacket, addr = mySocket.recvfrom(1024)
+                print(addr)
                 tracelist1.append(addr)
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
 
                 if timeLeft <= 0:
+                    print("*    *    * 2 Request timed out.")
                     tracelist1.append("*    *    * Request timed out.")
 
             except socket.timeout:
@@ -112,23 +115,29 @@ def get_route(hostname):
             else:
                 icmpHeader = recvPacket[20:28]
                 request_type, code, checksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
-
+                print(request_type)
                 if request_type == 11:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
+                    print(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
                     tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
+                    tracelist2.append(tracelist1)
                 elif request_type == 3:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
+                    print(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
                     tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
+                    tracelist2.append(tracelist1)
                 elif request_type == 0:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
+                    print(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - timeSent) * 1000, addr[0]))
                     tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - timeSent) * 1000, addr[0]))
-                    return tracelist2.append(tracelist1)
+                    tracelist2.append(tracelist1)
+                    return tracelist2
                 else:
                     tracelist1.append("error")
                     break
             finally:
-                tracelist2.append(tracelist1)
+                
                 mySocket.close()
