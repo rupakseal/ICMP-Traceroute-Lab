@@ -81,20 +81,19 @@ def ip_to_host(addr):
     except:
         # can't resolve it, so default to the address given
         shortname = addr
-        fqdn = ""
+        fqdn = "Hostname not returnable"
 
     return fqdn
 
 def get_route(hostname):
     timeLeft = TIMEOUT
-    tracelist1 = []  # This is your list to use when iterating through each trace
+      # This is your list to use when iterating through each trace
     tracelist2 = []  # This is your list to contain all traces
 
     for ttl in range(1, MAX_HOPS):
-
         for tries in range(TRIES):
             destAddr = socket.gethostbyname(hostname)
-
+            tracelist1 = []
             # Fill in start
             # Make a raw socket named mySocket
             icmp = socket.getprotobyname("icmp")
@@ -115,8 +114,11 @@ def get_route(hostname):
                 if whatReady[0] == []:  # Timeout
                     print("*    *    * 1 Request timed out.")
                     tracelist1.append("*    *    * Request timed out.")
-
+                tracelist1.append(whatReady[0])
                 recvPacket, addr = mySocket.recvfrom(1024)
+                print(addr)
+                tracelist1.append(addr)
+                tracelist1.append(ip_to_host(addr[0]))
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
 
@@ -134,29 +136,30 @@ def get_route(hostname):
                 if request_type == 11:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    #print (ttl, (timeReceived - t) * 1000, addr[0],ip_to_host(addr))
+                    print (ttl, (timeReceived - t) * 1000, addr[0],ip_to_host(addr[0]))
                     #print((addr[0]))
                     #print(socket.gethostbyaddr(addr[0]))
-                    tracelist1.append(ttl)
-                    tracelist1.append((timeReceived - t) * 1000)
-                    tracelist1.append(addr[0])
-                    tracelist1.append(ip_to_host(addr[0]))
+                    tracelist1.append((ttl, (timeReceived - t), addr[0],ip_to_host(addr[0])))
                     tracelist2.append(tracelist1)
-
                 elif request_type == 3:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-
+                    print(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
+                    tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
+                    tracelist2.append(tracelist1)
                 elif request_type == 0:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    return tracelist1
-                    #print(tracelist2)
-
+                    print(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - timeSent) * 1000, addr[0]))
+                    tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - timeSent) * 1000, addr[0]))
+                    tracelist2.append(tracelist1)
+                    return tracelist2
                 else:
-                    #print(tracelist2)
-
+                    tracelist1.append("error")
                     break
             finally:
 
                 mySocket.close()
+
+if __name__ == '__main__':
+      print(get_route('google.com'))
