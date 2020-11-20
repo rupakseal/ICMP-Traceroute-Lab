@@ -67,7 +67,23 @@ def build_packet():
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
     packet = header + data
     return packet
+def ip_to_host(addr):
+    """ convert an IP address to a host name, returning shortname and fqdn to the
+        caller
+    """
 
+    try:
+        fqdn = socket.gethostbyaddr(addr)[0]
+        shortname = fqdn.split('.')[0]
+        if fqdn == shortname:
+            fqdn = ""
+
+    except:
+        # can't resolve it, so default to the address given
+        shortname = addr
+        fqdn = ""
+
+    return shortname, fqdn
 
 def get_route(hostname):
     timeLeft = TIMEOUT
@@ -102,6 +118,7 @@ def get_route(hostname):
                 recvPacket, addr = mySocket.recvfrom(1024)
                 print(addr)
                 tracelist1.append(addr)
+                tracelist1.append(ip_to_host(addr))
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
 
@@ -119,8 +136,10 @@ def get_route(hostname):
                 if request_type == 11:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    print(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
-                    tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
+                    print (ttl, (timeReceived - t) * 1000, addr[0],ip_to_host(addr))
+                    #print((addr[0]))
+                    #print(socket.gethostbyaddr(addr[0]))
+                    tracelist1.append((ttl, (timeReceived - t), addr[0]))
                     tracelist2.append(tracelist1)
                 elif request_type == 3:
                     bytes = struct.calcsize("d")
@@ -139,5 +158,5 @@ def get_route(hostname):
                     tracelist1.append("error")
                     break
             finally:
-                
+
                 mySocket.close()
