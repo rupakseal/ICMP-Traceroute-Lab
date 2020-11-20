@@ -116,9 +116,9 @@ def get_route(hostname):
                     tracelist1.append("*    *    * Request timed out.")
                 tracelist1.append(whatReady[0])
                 recvPacket, addr = mySocket.recvfrom(1024)
-                print(addr)
-                tracelist1.append(addr)
-                tracelist1.append(ip_to_host(addr[0]))
+                #print(addr)
+                #tracelist1.append(addr)
+                #tracelist1.append(ip_to_host(addr[0]))
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
 
@@ -137,9 +137,8 @@ def get_route(hostname):
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     print (ttl, (timeReceived - t) * 1000, addr[0],ip_to_host(addr[0]))
-                    #print((addr[0]))
                     #print(socket.gethostbyaddr(addr[0]))
-                    tracelist1.append((ttl, (timeReceived - t), addr[0]))
+                    tracelist1.append(ttl, (timeReceived - t) * 1000, addr[0],ip_to_host(addr[0]))
                     tracelist2.append(tracelist1)
                 elif request_type == 3:
                     bytes = struct.calcsize("d")
