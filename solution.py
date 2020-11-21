@@ -67,6 +67,8 @@ def build_packet():
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
     packet = header + data
     return packet
+
+
 def ip_to_host(addr):
     """ convert an IP address to a host name, returning shortname and fqdn to the
         caller
@@ -85,14 +87,17 @@ def ip_to_host(addr):
 
     return fqdn
 
+
 def get_route(hostname):
     timeLeft = TIMEOUT
-      # This is your list to use when iterating through each trace
+    # This is your list to use when iterating through each trace
     tracelist2 = []  # This is your list to contain all traces
 
     for ttl in range(1, MAX_HOPS):
         for tries in range(TRIES):
             destAddr = socket.gethostbyname(hostname)
+            tracelist2.append(destAddr)
+            tracelist2.append(hostname)
             tracelist1 = []
             tracelist2.append(tracelist1)
             # Fill in start
@@ -134,23 +139,26 @@ def get_route(hostname):
                 if request_type == 11:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    tracelist1.append((str(ttl), str(round((timeReceived - t) * 1000))+"ms", addr[0],ip_to_host(addr[0])))
+                    tracelist1.append(
+                        (str(ttl), str(round((timeReceived - t) * 1000)) + "ms", addr[0], ip_to_host(addr[0])))
 
                 elif request_type == 3:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    tracelist1.append((str(ttl), str(round((timeReceived - t) * 1000))+"ms", addr[0],ip_to_host(addr[0])))
+                    tracelist1.append(
+                        (str(ttl), str(round((timeReceived - t) * 1000)) + "ms", addr[0], ip_to_host(addr[0])))
 
 
                 elif request_type == 0:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    tracelist1.append((str(ttl), str(round((timeReceived - t) * 1000))+"ms", addr[0],ip_to_host(addr[0])))
-                    print(tracelist2)
+                    tracelist1.append(
+                        (str(ttl), str(round((timeReceived - t) * 1000)) + "ms", addr[0], ip_to_host(addr[0])))
+                    #print(tracelist2)
                     return tracelist2
                 else:
                     tracelist1.append("error")
                     break
             finally:
-                
+
                 mySocket.close()
