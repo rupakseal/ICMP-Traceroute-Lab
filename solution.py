@@ -96,8 +96,6 @@ def get_route(hostname):
     for ttl in range(1, MAX_HOPS):
         for tries in range(TRIES):
             destAddr = socket.gethostbyname(hostname)
-            tracelist2.append(destAddr)
-            tracelist2.append(hostname)
             tracelist1 = []
             tracelist2.append(tracelist1)
             # Fill in start
@@ -118,7 +116,6 @@ def get_route(hostname):
                 howLongInSelect = (time.time() - startedSelect)
 
                 if whatReady[0] == []:  # Timeout
-                    print("*    *    * 1 Request timed out.")
                     tracelist1.append("*    *    * Request timed out.")
                 tracelist1.append(whatReady[0])
                 recvPacket, addr = mySocket.recvfrom(1024)
@@ -126,7 +123,6 @@ def get_route(hostname):
                 timeLeft = timeLeft - howLongInSelect
 
                 if timeLeft <= 0:
-                    print("*    *    * 2 Request timed out.")
                     tracelist1.append("*    *    * Request timed out.")
 
             except socket.timeout:
@@ -154,7 +150,7 @@ def get_route(hostname):
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     tracelist1.append(
                         (str(ttl), str(round((timeReceived - t) * 1000)) + "ms", addr[0], ip_to_host(addr[0])))
-                    #print(tracelist2)
+                    print(tracelist2)
                     return tracelist2
                 else:
                     tracelist1.append("error")
