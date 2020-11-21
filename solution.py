@@ -81,7 +81,7 @@ def ip_to_host(addr):
     except:
         # can't resolve it, so default to the address given
         shortname = addr
-        fqdn = "Hostname not returnable"
+        fqdn = "hostname not returnable"
 
     return fqdn
 
@@ -120,6 +120,7 @@ def get_route(hostname):
                 #print(addr)
                 #tracelist1.append(addr)
                 #tracelist1.append(ip_to_host(addr[0]))
+                print(ip_to_host(addr[0]))
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
 
@@ -153,7 +154,7 @@ def get_route(hostname):
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     print(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - timeSent) * 1000, addr[0]))
                     tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - timeSent) * 1000, addr[0]))
-
+                    print(tracelist2)
                     return tracelist2
                 else:
                     tracelist1.append("error")
